@@ -1,5 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 import {
     View,
@@ -8,7 +10,20 @@ import {
 
 } from 'react-native';
 
-const AuthLoadingScreen = () => {
+const AuthLoadingScreen = ({navigation}) => {
+
+    checkToken();
+
+    const checkToken = async() =>{
+        const token = await AsyncStorage.getItem('token');
+
+        if (token){
+            navigation.navigator('App');
+        }
+        else {
+            navigation.navigator('Auth');
+        }
+    };
 
     return (
         <View style={[styles.container]}>

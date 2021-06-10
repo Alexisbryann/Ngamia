@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import AsyncStorage from '@react-native-community/async-storage';
 import {
   View,
   Button,
@@ -10,24 +10,12 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
+
 } from 'react-native';
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-
-  const axiosApiCall = () => {
-    axios
-      .post('https://apide.ngamia.africa/api/MyAccount/Login', {
-        email: email,
-        password: password,
-      })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
+  const [email, onChangeEmail] = React.useState('');
+  const [password, onChangePassword] = React.useState('');
 
   return (
     <View style={styles.container}>
@@ -44,7 +32,7 @@ const LoginScreen = ({ navigation }) => {
           placeholder="Email."
           placeholderTextColor="#003f5c"
           keyboardType="email-address"
-          onChangeText={email => setEmail(email)}
+          onChangeText={onChangeEmail}
         />
       </View>
 
@@ -53,8 +41,8 @@ const LoginScreen = ({ navigation }) => {
           style={styles.TextInput}
           placeholder="Password."
           placeholderTextColor="#003f5c"
-          secureTextEntry={true}
-          onChangeText={password => setPassword(password)}
+          // secureTextEntry={true}
+          onChangeText={onChangePassword}
         />
       </View>
 
@@ -63,9 +51,22 @@ const LoginScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.loginBtn}
-        onPress= {() => navigation.navigate('App')}
+        onPress={() => axios.post('https://apide.ngamia.africa/api/MyAccount/Login', {
+          'email': email,
+          'password': password,
+          'transporter': true,
+          'driver': false,
+          'agent': false,
+          'trader': false,
+        }).then(response => {
+          AsyncStorage.setItem('token', response.data.profile.token);
+          navigation.navigate('App');
+          Alert.alert('Login Successfull');
+        }).catch(error => {
+          console.log(error.message);
+        })}
       >
-        <Text style = {styles.Text}>Login</Text>
+        <Text style={styles.Text}>Login</Text>
       </TouchableOpacity>
 
     </View>
