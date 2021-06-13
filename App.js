@@ -5,10 +5,12 @@ import AppContainer from './routes';
 import LoginScreen from './screens/LoginScreen';
 import AuthLoadingScreen from './screens/AuthLoadingScreen';
 
-const App = () => {
+class App extends React.Component  {
+    render(){
     return (
         <AppContainer />
     );
-};
+}
+}
 
 export default App;

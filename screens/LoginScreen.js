@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from 'react';
+import React from 'react';
 import axios from 'axios';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {
   View,
-  Button,
   Image,
   Text,
   StyleSheet,
@@ -13,65 +13,107 @@ import {
   Alert,
 
 } from 'react-native';
-const LoginScreen = ({ navigation }) => {
-  const [email, onChangeEmail] = React.useState('');
-  const [password, onChangePassword] = React.useState('');
+class LoginScreen extends React.Component {
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.name}>NGAMIA DRIVER APP</Text>
+  state = {
+    email: '',
+    password: '',
+    loading: false,
+  }
 
-      {/* <TouchableOpacity>
-        <Image style={styles.image}
-          source={require('./assets/logo.png')} />
-      </TouchableOpacity> */}
+  onChangeHandle(state, value) {
+    this.setState({
+      [state]: value,
+    });
+  }
 
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.TextInput}
-          placeholder="Email."
-          placeholderTextColor="#003f5c"
-          keyboardType="email-address"
-          onChangeText={onChangeEmail}
-        />
-      </View>
-
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.TextInput}
-          placeholder="Password."
-          placeholderTextColor="#003f5c"
-          // secureTextEntry={true}
-          onChangeText={onChangePassword}
-        />
-      </View>
-
-      <TouchableOpacity>
-        <Text style={styles.forgot_button}>Forgot Password?</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.loginBtn}
-        onPress={() => axios.post('https://apide.ngamia.africa/api/MyAccount/Login', {
+  doLogin() {
+    const { email, password } = this.state;
+    if (email && password) {
+      const req = {
           'email': email,
           'password': password,
           'transporter': true,
           'driver': false,
           'agent': false,
           'trader': false,
-        }).then(response => {
-          AsyncStorage.setItem('token', response.data.profile.token);
-          navigation.navigate('App');
-          Alert.alert('Login Successfull');
-        }).catch(error => {
-          console.log(error.message);
-        })}
-      >
-        <Text style={styles.Text}>Login</Text>
-      </TouchableOpacity>
+      };
+      this.setState({
+        loading: true,
+      });
+      axios.post('https://apide.ngamia.africa/api/MyAccount/Login',req)
+        .then(
+          res => {
+            this.setState({
+              loading: false,
+            });
+            AsyncStorage.setItem('token', res.data.profile.token)
+            .then(res => {
+            this.props.navigation.navigate('App');
+            console.log(JSON.stringify.message);
+            });
+          },
+          err => {
+            this.setState({
+              loading: false,
+            });
+            Alert.alert('Username or password is wrong');
+            console.log(err.message);
+          });
+        }
+    else {
+      Alert.alert('Enter Username & Password');
+    }
+  }
 
-    </View>
-  );
-};
+  render() {
+    const { email, password, loading } = this.state;
+    return (
+      <View style={styles.container} >
+        <Text style={styles.name}>NGAMIA DRIVER APP</Text>
+
+        <TouchableOpacity>
+          <Image style={styles.image} />
+        </TouchableOpacity>
+
+        <View style={styles.inputView}>
+          <TextInput
+            style={styles.TextInput}
+            placeholder="Email."
+            placeholderTextColor="#003f5c"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={(value) => this.onChangeHandle('email',value)}
+          />
+        </View>
+
+        <View style={styles.inputView}>
+          <TextInput
+            style={styles.TextInput}
+            placeholder="Password."
+            placeholderTextColor="#003f5c"
+            secureTextEntry={true}
+            value={password}
+            onChangeText={(value) => this.onChangeHandle('password',value)}
+          />
+        </View>
+
+        <TouchableOpacity>
+          <Text style={styles.forgot_button}>Forgot Password?</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.loginBtn}
+          onPress={() => this.doLogin()}
+          // disabled={loading}
+        >
+          {/* {loading ? 'Loading... ' : 'Signin'} */}
+          <Text style={styles.Text}>Login</Text>
+        </TouchableOpacity>
+
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {

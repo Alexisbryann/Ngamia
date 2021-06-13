@@ -2,35 +2,42 @@
 import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 import {
     View,
     ActivityIndicator,
     StyleSheet,
 
 } from 'react-native';
+class AuthLoadingScreen extends React.Component {
 
-const AuthLoadingScreen = ({navigation}) => {
+    constructor() {
+        super();
+        this.checkToken();
+    }
 
-    checkToken();
-
-    const checkToken = async() =>{
-        const token = await AsyncStorage.getItem('token');
-
-        if (token){
-            navigation.navigator('App');
+    checkToken = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (token) {
+                this.props.navigation.navigate('App');
+            }
+            else {
+                this.props.navigation.navigate('Auth');
+            }
         }
-        else {
-            navigation.navigator('Auth');
+        catch (error) {
+            console.log(error.message);
         }
     };
 
-    return (
-        <View style={[styles.container]}>
-            <ActivityIndicator size="large" color="#6b471c" />
-        </View>
-    );
-};
+    render() {
+        return (
+            <View style={[styles.container]} >
+                <ActivityIndicator size="large" color="#6b471c" />
+            </View>
+        );
+    }
+}
 
 const styles = StyleSheet.create({
     container: {
@@ -38,10 +45,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    // horizontal: {
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-around',
-    //     padding: 10,
-    // },
 });
 export default AuthLoadingScreen;

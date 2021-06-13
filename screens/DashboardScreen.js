@@ -1,5 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 import {
     View,
@@ -9,23 +11,34 @@ import {
 
 } from 'react-native';
 
-const DashboardScreen = ({ navigation }) => {
+class DashboardScreen extends React.Component {
 
+    doLogout(){
+        AsyncStorage.removeItem('token')
+            .then(
+                res => {
+                    this.props.navigation.navigate('Auth');
+                }
+            );
+    }
+
+    render(){
     return (
         <View
             style={styles.container}>
             <Text>Welcome home</Text>
 
             <View >
-                <Button style = {styles.logoutBtn}
+                <Button style={styles.logoutBtn}
                     title="Logout"
-                    onPress={() => navigation.navigate('Auth')}
+                    onPress={() => this.doLogout()}
                 />
             </View>
         </View>
 
     );
-};
+}
+}
 const styles = StyleSheet.create({
     container: {
         flex: 1,

@@ -27,7 +27,7 @@ const AppNavigator = createStackNavigator({
     AuthLoading: AuthLoadingScreen,
 }, {
     headerMode: 'none',
-    initialRouteName: 'AuthLoadingScreen',
+    initialRouteName: 'AuthLoading',
 });
 
 export default createAppContainer(AppNavigator);
