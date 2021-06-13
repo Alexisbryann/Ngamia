@@ -1,7 +1,12 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import 'react-native-gesture-handler';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { TabNavigator } from 'react-navigation';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import {
     View,
@@ -10,10 +15,39 @@ import {
     Button,
 
 } from 'react-native';
+import react from 'react';
+
+const Tab = createBottomTabNavigator();
 
 class DashboardScreen extends React.Component {
 
-    doLogout(){
+    static Stack = createStackNavigator();
+
+    render() {
+        return (
+            <NavigationContainer>
+                <Tab.Navigator
+                    tabBarOptions={{
+                        activeTintColor: '#6b471c',
+                        inactiveTintColor: '#f5b14b',
+                        labelStyle: {
+                            fontSize: 20,
+                        },
+                    }}
+                >
+                    <Tab.Screen name="Home" component={SettingsScreen} />
+                    <Tab.Screen name="Profile" component={ProfileScreen} />
+                </Tab.Navigator>
+            </NavigationContainer>
+
+
+        );
+    }
+}
+
+
+class ProfileScreen extends React.Component {
+    doLogout() {
         AsyncStorage.removeItem('token')
             .then(
                 res => {
@@ -21,26 +55,35 @@ class DashboardScreen extends React.Component {
                 }
             );
     }
-
-    render(){
-    return (
-        <View
-            style={styles.container}>
-            <Text>Welcome home</Text>
-
-            <View >
-                <Button style={styles.logoutBtn}
+    render() {
+        return (
+            <View style = {styles.container}>
+                <Button
+                    style={styles.logoutBtn}
                     title="Logout"
                     onPress={() => this.doLogout()}
                 />
             </View>
-        </View>
+        );
+    }
+}
+class SettingsScreen extends React.Component {
+    render() {
+        return (
+            <View style={styles.tabs}>
+                <Text>Home!</Text>
+            </View>
+        );
+    }
+}
 
-    );
-}
-}
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    tabs: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -56,3 +99,4 @@ const styles = StyleSheet.create({
     },
 });
 export default DashboardScreen;
+
