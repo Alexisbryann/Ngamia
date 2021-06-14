@@ -7,6 +7,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
+
 import {
     View,
     Text,
@@ -14,14 +15,15 @@ import {
     Button,
     FlatList,
     ActivityIndicator,
-    Alert,
+    Image,
 
 } from 'react-native';
-import axios from 'axios';
 
 const Tab = createBottomTabNavigator();
 const jobsApi = 'https://apide.ngamia.africa/api/Transporter/GetPostedJobs';
-
+// const itemId = this.props.navigation.getParam('itemId', 'NO-ID');
+// const {profileArray} = this.props.navigation.getParam('profileArray');
+// const { itemId, otherParam } = route.params;
 
 class DashboardScreen extends React.Component {
 
@@ -51,6 +53,82 @@ class DashboardScreen extends React.Component {
 }
 
 class ProfileScreen extends React.Component {
+
+    // constructor() {
+    //     super();
+    // }
+    // render() {
+    //     const prof = this.props.navigation.getParams('otherParam', 'NO-User');
+    //     return (
+    //         <View style={styles.container}>
+    //             <Text>{JSON.stringify(prof)}</Text>
+    //         </View>
+    //     );
+    // }
+
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //         isLoading: true,
+    //         dataSource: [],
+    //     };
+    // }
+
+    // componentDidMount() {
+    //     async () => {
+    //         try {
+    //             // const dealerID = await (await AsyncStorage.getItem('dealerID'));
+    //             const token = await (await AsyncStorage.getItem('token'));
+
+    //             fetch('https://apide.ngamia.africa/api/MyAccount/Login', {
+    //                 body: dealerID,
+    //             }
+    //                 .then((response) => response.json())
+    //                 .then((responseJson) => {
+    //                     this.setState({
+    //                         isLoading: false,
+    //                         dataSource: responseJson,
+    //                     });
+    //                 }));
+    //         }
+    //         catch (error) {
+    //             console.log(error.message);
+    //         }
+    //     };
+
+    // }
+
+    // _renderItem = ({ item, index }) => {
+    //     return (
+    //         <View style={styles.item}>
+    //             <Text>{item.jobs}</Text>
+    //         </View>
+    //     );
+    // }
+
+    // render() {
+    //     // let {container} = styles;
+    //     let { dataSource, isLoading } = this.state;
+
+    //     if (isLoading) {
+    //         return (
+    //             <View style={styles.container}>
+    //                 <ActivityIndicator size="large" animating />
+    //             </View>
+    //         );
+    //     } else {
+    //         return (
+    //             <View style={styles.container}>
+    //                 <FlatList
+    //                     data={dataSource}
+    //                     renderItem={this._renderItem}
+    //                     keyExtractor={(item, index) => index.toString()}
+    //                 />
+    //             </View>
+    //         );
+    //     }
+    // }
+
     doLogout() {
         AsyncStorage.removeItem('token')
             .then(
@@ -67,27 +145,39 @@ class ProfileScreen extends React.Component {
                     title="Logout"
                     onPress={() => this.doLogout()}
                 />
+
             </View>
         );
     }
 }
 class HomeScreen extends React.Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = {
-            isLoading: true,
             dataSource: [],
         };
+    }
+
+    _renderItem = ({ item }) => {
+        return (
+            <View style={styles.item}>
+                <Text>{item.jobs.newJobs}</Text>
+                <Text>{item.jobs.newJobs}</Text>
+                <Image style={{ width: 50, height: 50 }}
+                    source={{ uri: item.jobs.newJobs.imageUrl }} />
+
+            </View>
+        );
     }
 
     componentDidMount() {
         async () => {
             try {
-                const dealerID = await AsyncStorage.getItem('dealerID');
-                const token = await AsyncStorage.getItem('token');
+                const dealerID = await (await AsyncStorage.getItem('dealerID'));
+                const token = await (await AsyncStorage.getItem('token'));
 
-                fetch('https://apide.ngamia.africa/api/Transporter/GetPostedJobs', {
+                fetch(jobsApi, {
                     method: 'post',
                     headers: new Headers({
                         'Authorization': token,
@@ -97,8 +187,7 @@ class HomeScreen extends React.Component {
                     .then((response) => response.json())
                     .then((responseJson) => {
                         this.setState({
-                            isLoading: false,
-                            dataSource: responseJson,
+                            dataSource: responseJson.jobs,
                         });
                     }));
             }
@@ -109,35 +198,16 @@ class HomeScreen extends React.Component {
 
     }
 
-    _renderItem = ({ item, index }) => {
+    render() {
+
         return (
-            <View style={styles.item}>
-                <Text>{item.jobs}</Text>
+            <View style={styles.container}>
+                <FlatList
+                    data={this.state.dataSource}
+                    renderItem={this._renderItem}
+                />
             </View>
         );
-    }
-
-    render() {
-        // let {container} = styles;
-        let { dataSource, isLoading } = this.state;
-
-        if (isLoading) {
-            return (
-                <View style={styles.container}>
-                    <ActivityIndicator size="large" animating />
-                </View>
-            );
-        } else {
-            return (
-                <View style={styles.container}>
-                    <FlatList
-                        data={dataSource}
-                        renderItem={this._renderItem}
-                        keyExtractor={(item, index) => index.toString()}
-                    />
-                </View>
-            );
-        }
     }
 }
 

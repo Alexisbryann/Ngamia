@@ -31,27 +31,38 @@ class LoginScreen extends React.Component {
     const { email, password } = this.state;
     if (email && password) {
       const req = {
-          'email': email,
-          'password': password,
-          'transporter': true,
-          'driver': false,
-          'agent': false,
-          'trader': false,
+        'email': email,
+        'password': password,
+        'transporter': true,
+        'driver': false,
+        'agent': false,
+        'trader': false,
       };
       this.setState({
         loading: true,
       });
-      axios.post('https://apide.ngamia.africa/api/MyAccount/Login',req)
+      var profileArray = [];
+      axios.post('https://apide.ngamia.africa/api/MyAccount/Login', req)
         .then(
           res => {
             this.setState({
               loading: false,
             });
-            AsyncStorage.setItem('token', res.data.profile.token);
-            AsyncStorage.setItem('dealerID', res.data.business.dealerID)
+            // AsyncStorage.setItem('token', res.data.profile.token)
+            var items = [['token', res.data.profile.token], ['dealerID', res.data.business.dealerID]];
+            AsyncStorage.setItem('KEY', JSON.stringify(items))
             .then(res => {
-            this.props.navigation.navigate('App');
-            console.log(JSON.stringify.message);
+              const profileData = {
+                id: res.data.profile.userId,
+                username: res.data.profile.userName,
+                email: res.data.profile.email,
+                name: res.data.profile.name,
+                dob: res.data.profile.dob,
+                phonenumber: res.data.profile.phoneNumber,
+              };
+              profileArray.push(profileData);
+              this.props.navigation.navigate('App');
+              console.log(JSON.stringify.message);
             });
           },
           err => {
@@ -61,7 +72,7 @@ class LoginScreen extends React.Component {
             Alert.alert('Username or password is wrong');
             console.log(err.message);
           });
-        }
+    }
     else {
       Alert.alert('Enter Username & Password');
     }
@@ -84,7 +95,7 @@ class LoginScreen extends React.Component {
             placeholderTextColor="#003f5c"
             keyboardType="email-address"
             value={email}
-            onChangeText={(value) => this.onChangeHandle('email',value)}
+            onChangeText={(value) => this.onChangeHandle('email', value)}
           />
         </View>
 
@@ -95,7 +106,7 @@ class LoginScreen extends React.Component {
             placeholderTextColor="#003f5c"
             secureTextEntry={true}
             value={password}
-            onChangeText={(value) => this.onChangeHandle('password',value)}
+            onChangeText={(value) => this.onChangeHandle('password', value)}
           />
         </View>
 
@@ -105,7 +116,7 @@ class LoginScreen extends React.Component {
 
         <TouchableOpacity style={styles.loginBtn}
           onPress={() => this.doLogin()}
-          // disabled={loading}
+        // disabled={loading}
         >
           {/* {loading ? 'Loading... ' : 'Signin'} */}
           <Text style={styles.Text}>Login</Text>
