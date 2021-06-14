@@ -5,19 +5,23 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { TabNavigator } from 'react-navigation';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 import {
     View,
     Text,
     StyleSheet,
     Button,
+    FlatList,
+    ActivityIndicator,
+    Alert,
 
 } from 'react-native';
-import react from 'react';
+import axios from 'axios';
 
 const Tab = createBottomTabNavigator();
+const jobsApi = 'https://apide.ngamia.africa/api/Transporter/GetPostedJobs';
+
 
 class DashboardScreen extends React.Component {
 
@@ -32,10 +36,11 @@ class DashboardScreen extends React.Component {
                         inactiveTintColor: '#f5b14b',
                         labelStyle: {
                             fontSize: 20,
+                            fontWeight: 'bold',
                         },
                     }}
                 >
-                    <Tab.Screen name="Home" component={SettingsScreen} />
+                    <Tab.Screen name="Home" component={HomeScreen} />
                     <Tab.Screen name="Profile" component={ProfileScreen} />
                 </Tab.Navigator>
             </NavigationContainer>
@@ -44,7 +49,6 @@ class DashboardScreen extends React.Component {
         );
     }
 }
-
 
 class ProfileScreen extends React.Component {
     doLogout() {
@@ -57,7 +61,7 @@ class ProfileScreen extends React.Component {
     }
     render() {
         return (
-            <View style = {styles.container}>
+            <View style={styles.container}>
                 <Button
                     style={styles.logoutBtn}
                     title="Logout"
@@ -67,13 +71,73 @@ class ProfileScreen extends React.Component {
         );
     }
 }
-class SettingsScreen extends React.Component {
-    render() {
+class HomeScreen extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: true,
+            dataSource: [],
+        };
+    }
+
+    componentDidMount() {
+        async () => {
+            try {
+                const dealerID = await AsyncStorage.getItem('dealerID');
+                const token = await AsyncStorage.getItem('token');
+
+                fetch('https://apide.ngamia.africa/api/Transporter/GetPostedJobs', {
+                    method: 'post',
+                    headers: new Headers({
+                        'Authorization': token,
+                    }),
+                    body: dealerID,
+                }
+                    .then((response) => response.json())
+                    .then((responseJson) => {
+                        this.setState({
+                            isLoading: false,
+                            dataSource: responseJson,
+                        });
+                    }));
+            }
+            catch (error) {
+                console.log(error.message);
+            }
+        };
+
+    }
+
+    _renderItem = ({ item, index }) => {
         return (
-            <View style={styles.tabs}>
-                <Text>Home!</Text>
+            <View style={styles.item}>
+                <Text>{item.jobs}</Text>
             </View>
         );
+    }
+
+    render() {
+        // let {container} = styles;
+        let { dataSource, isLoading } = this.state;
+
+        if (isLoading) {
+            return (
+                <View style={styles.container}>
+                    <ActivityIndicator size="large" animating />
+                </View>
+            );
+        } else {
+            return (
+                <View style={styles.container}>
+                    <FlatList
+                        data={dataSource}
+                        renderItem={this._renderItem}
+                        keyExtractor={(item, index) => index.toString()}
+                    />
+                </View>
+            );
+        }
     }
 }
 
@@ -96,6 +160,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginTop: 40,
         backgroundColor: '#6b471c',
+    },
+    item: {
+        padding: 5,
+        borderBottomWidth: 1,
+        borderBottomColor: '#6b471c',
     },
 });
 export default DashboardScreen;

@@ -47,7 +47,8 @@ class LoginScreen extends React.Component {
             this.setState({
               loading: false,
             });
-            AsyncStorage.setItem('token', res.data.profile.token)
+            AsyncStorage.setItem('token', res.data.profile.token);
+            AsyncStorage.setItem('dealerID', res.data.business.dealerID)
             .then(res => {
             this.props.navigation.navigate('App');
             console.log(JSON.stringify.message);
