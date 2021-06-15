@@ -6,7 +6,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 import {
     View,
     Text,
@@ -14,6 +13,7 @@ import {
     Button,
     FlatList,
     Image,
+    Alert,
 
 } from 'react-native';
 import fetch from 'node-fetch';
@@ -40,6 +40,7 @@ class DashboardScreen extends React.Component {
                 >
                     <Tab.Screen name="Home" component={HomeScreen} />
                     <Tab.Screen name="Profile" component={ProfileScreen} />
+
                 </Tab.Navigator>
             </NavigationContainer>
 
@@ -50,78 +51,16 @@ class DashboardScreen extends React.Component {
 
 class ProfileScreen extends React.Component {
 
-
-    //   state = {
-    //     email: '',
-    //     password: '',
-    //     loading: false,
-    //   }
-
-    //   onChangeHandle(state, value) {
-    //     this.setState({
-    //       [state]: value,
-    //     });
-    //   }
-
-    //   doLogin() {
-    //     const { email, password } = this.state;
-    //     if (email && password) {
-    //       const req = {
-    //         'email': email,
-    //         'password': password,
-    //         'transporter': true,
-    //         'driver': false,
-    //         'agent': false,
-    //         'trader': false,
-    //       };
-    //       this.setState({
-    //         loading: true,
-    //       });
-    //       var profileArray = [];
-    //       axios.post('https://apide.ngamia.africa/api/MyAccount/Login', req)
-    //         .then(
-    //           res => {
-    //             this.setState({
-    //               loading: false,
-    //             })
-    //             // AsyncStorage.setItem('token', res.data.profile.token)
-    //             // var items = [['token', res.profile.token], ['dealerID', res.business.dealerID]];
-    //             // AsyncStorage.setItem('KEY', JSON.stringify(items))
-    //             .then(res => {
-    //               const profileData = {
-    //                 id: res.data.profile.userId,
-    //                 username: res.data.profile.userName,
-    //                 email: res.data.profile.email,
-    //                 name: res.data.profile.name,
-    //                 dob: res.data.profile.dob,
-    //                 phonenumber: res.data.profile.phoneNumber,
-    //               };
-    //               profileArray.push(profileData);
-    //               this.props.navigation.navigate('App');
-    //               console.log(JSON.stringify.message);
-    //             });
-    //           },
-    //           err => {
-    //             this.setState({
-    //               loading: false,
-    //             });
-    //             Alert.alert('Username or password is wrong');
-    //             console.log(err.message);
-    //           });
-    //     }
-    //     else {
-    //       Alert.alert('Enter Username & Password');
-    //     }
-    //   }
-
     doLogout() {
-        AsyncStorage.removeItem('token')
-            .then(
-                res => {
-                    this.props.navigation.navigate('Auth');
-                }
-            );
+        AsyncStorage.removeItem('token');
+        Alert.alert('You have signed out');
+        this.props.navigation.navigate('Auth');
+
+    } catch(error) {
+        console.log('err', error);
     }
+
+
     render() {
         return (
             <View style={styles.container}>
@@ -145,8 +84,8 @@ class HomeScreen extends React.Component {
     renderItem = ({ item }) => {
         return (
             <View style={styles.item}>
-                <Text>{item.status}</Text>
-                <Text>{item.jobs}</Text>
+                <Text>{item.jobs.newJobs.id}</Text>
+                <Text>{item.jobs.newJobs.subscriber}</Text>
                 <Image style={styles.Image}
                     source={{ uri: item.jobs.newJobs.imageUrl }} />
 
@@ -166,19 +105,18 @@ class HomeScreen extends React.Component {
                     'Content-Type': 'application/json',
                     'Authorization': bearer,
                 },
-                body: dealerID,
+                body:JSON.stringify(dealerID),
             })
-            .then(response => response.json())
-            .then((responseJson) => {
-                console.log(responseJson.message);
+            // .then(response => response.json())
+            .then((response) => {
                 this.setState({
-                    dataSource: (responseJson.jobs.status),
+                    dataSource: (response.data.jobs.newJobs),
                 }).
                     catch((error) => {
                         console.log(error.message);
                     });
             }).catch(function (error) {
-                console.log(error);
+                console.log(error.message);
             });
     }
     render() {
@@ -188,7 +126,7 @@ class HomeScreen extends React.Component {
                 <FlatList
                     data={this.state.dataSource}
                     renderItem={this.renderItem}
-                    keyExtractor={(item, index) => index}
+                    keyExtractor={(item, index) => item}
                 />
             </View>
         );

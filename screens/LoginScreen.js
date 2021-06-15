@@ -63,7 +63,11 @@ class LoginScreen extends React.Component {
               // profileArray.push(profileData);
               // AsyncStorage.setItem('profile', profileArray);
               this.props.navigation.navigate('App');
-              console.log(JSON.stringify.message);
+              Alert.alert(
+                'Success!',
+                 'successfully signed in!'
+              );
+              // console.log(JSON.stringify.message);
             });
           },
           err => {
