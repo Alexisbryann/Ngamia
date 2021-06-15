@@ -48,19 +48,19 @@ class LoginScreen extends React.Component {
             this.setState({
               loading: false,
             });
-            // AsyncStorage.setItem('token', res.data.profile.token)
-            var items = [['token', res.data.profile.token], ['dealerID', res.data.business.dealerID]];
-            AsyncStorage.setItem('KEY', JSON.stringify(items))
+            AsyncStorage.setItem('token', res.data.profile.token)
+            // var items = [['token', res.profile.token], ['dealerID', res.business.dealerID]];
+            // AsyncStorage.setItem('KEY', JSON.stringify(items))
             .then(res => {
-              const profileData = {
-                id: res.data.profile.userId,
-                username: res.data.profile.userName,
-                email: res.data.profile.email,
-                name: res.data.profile.name,
-                dob: res.data.profile.dob,
-                phonenumber: res.data.profile.phoneNumber,
-              };
-              profileArray.push(profileData);
+              // const profileData = {
+              //   id: res.data.profile.userId,
+              //   username: res.data.profile.userName,
+              //   email: res.data.profile.email,
+              //   name: res.data.profile.name,
+              //   dob: res.data.profile.dob,
+              //   phonenumber: res.data.profile.phoneNumber,
+              // };
+              // profileArray.push(profileData);
               this.props.navigation.navigate('App');
               console.log(JSON.stringify.message);
             });
