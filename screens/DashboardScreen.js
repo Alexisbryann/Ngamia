@@ -10,10 +10,8 @@ import {
     View,
     Text,
     StyleSheet,
-    Button,
     FlatList,
     Image,
-    Alert,
 
 } from 'react-native';
 import fetch from 'node-fetch';
@@ -51,24 +49,10 @@ class DashboardScreen extends React.Component {
 
 class ProfileScreen extends React.Component {
 
-    doLogout() {
-        AsyncStorage.removeItem('token');
-        Alert.alert('You have signed out');
-        this.props.navigation.navigate('Auth');
-
-    } catch(error) {
-        console.log('err', error);
-    }
-
-
     render() {
         return (
             <View style={styles.container}>
-                <Button
-                    style={styles.logoutBtn}
-                    title="Logout"
-                    onPress={() => this.doLogout()}
-                />
+                <Text>We'll display the user profile on this page.</Text>
 
             </View>
         );
@@ -105,7 +89,7 @@ class HomeScreen extends React.Component {
                     'Content-Type': 'application/json',
                     'Authorization': bearer,
                 },
-                body:JSON.stringify(dealerID),
+                body: JSON.stringify(dealerID),
             })
             // .then(response => response.json())
             .then((response) => {
@@ -123,11 +107,14 @@ class HomeScreen extends React.Component {
 
         return (
             <View style={styles.container}>
-                <FlatList
+                <FlatList styles={styles.item}
                     data={this.state.dataSource}
                     renderItem={this.renderItem}
-                    keyExtractor={(item, index) => item}
+                    keyExtr
+                    actor={(item, index) => item}
                 />
+                <Text style={styles.container}>We'll display Posted jobs here</Text>
+
             </View>
         );
     }
