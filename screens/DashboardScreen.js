@@ -13,19 +13,13 @@ import {
     StyleSheet,
     Button,
     FlatList,
-    ActivityIndicator,
     Image,
-    Alert,
 
 } from 'react-native';
-import axios from 'axios';
 import fetch from 'node-fetch';
 
 const Tab = createBottomTabNavigator();
 const jobsApi = 'https://apide.ngamia.africa/api/Transporter/GetPostedJobs';
-// const itemId = this.props.navigation.getParam('itemId', 'NO-ID');
-// const {profileArray} = this.props.navigation.getParam('profileArray');
-// const { itemId, otherParam } = route.params;
 
 class DashboardScreen extends React.Component {
 
@@ -56,80 +50,69 @@ class DashboardScreen extends React.Component {
 
 class ProfileScreen extends React.Component {
 
-    // constructor() {
-    //     super();
-    // }
-    // render() {
-    //     const prof = this.props.navigation.getParams('otherParam', 'NO-User');
-    //     return (
-    //         <View style={styles.container}>
-    //             <Text>{JSON.stringify(prof)}</Text>
-    //         </View>
-    //     );
-    // }
 
-    // constructor(props) {
-    //     super(props);
-    //     this.state = {
-    //         isLoading: true,
-    //         dataSource: [],
-    //     };
-    // }
+    //   state = {
+    //     email: '',
+    //     password: '',
+    //     loading: false,
+    //   }
 
-    // componentDidMount() {
-    //     async () => {
-    //         try {
-    //             // const dealerID = await (await AsyncStorage.getItem('dealerID'));
-    //             const token = await (await AsyncStorage.getItem('token'));
+    //   onChangeHandle(state, value) {
+    //     this.setState({
+    //       [state]: value,
+    //     });
+    //   }
 
-    //             fetch('https://apide.ngamia.africa/api/MyAccount/Login', {
-    //                 body: dealerID,
-    //             }
-    //                 .then((response) => response.json())
-    //                 .then((responseJson) => {
-    //                     this.setState({
-    //                         isLoading: false,
-    //                         dataSource: responseJson,
-    //                     });
-    //                 }));
-    //         }
-    //         catch (error) {
-    //             console.log(error.message);
-    //         }
-    //     };
-
-    // }
-
-    // _renderItem = ({ item, index }) => {
-    //     return (
-    //         <View style={styles.item}>
-    //             <Text>{item.jobs}</Text>
-    //         </View>
-    //     );
-    // }
-
-    // render() {
-    //     // let {container} = styles;
-    //     let { dataSource, isLoading } = this.state;
-
-    //     if (isLoading) {
-    //         return (
-    //             <View style={styles.container}>
-    //                 <ActivityIndicator size="large" animating />
-    //             </View>
-    //         );
-    //     } else {
-    //         return (
-    //             <View style={styles.container}>
-    //                 <FlatList
-    //                     data={dataSource}
-    //                     renderItem={this._renderItem}
-    //                     keyExtractor={(item, index) => index.toString()}
-    //                 />
-    //             </View>
-    //         );
+    //   doLogin() {
+    //     const { email, password } = this.state;
+    //     if (email && password) {
+    //       const req = {
+    //         'email': email,
+    //         'password': password,
+    //         'transporter': true,
+    //         'driver': false,
+    //         'agent': false,
+    //         'trader': false,
+    //       };
+    //       this.setState({
+    //         loading: true,
+    //       });
+    //       var profileArray = [];
+    //       axios.post('https://apide.ngamia.africa/api/MyAccount/Login', req)
+    //         .then(
+    //           res => {
+    //             this.setState({
+    //               loading: false,
+    //             })
+    //             // AsyncStorage.setItem('token', res.data.profile.token)
+    //             // var items = [['token', res.profile.token], ['dealerID', res.business.dealerID]];
+    //             // AsyncStorage.setItem('KEY', JSON.stringify(items))
+    //             .then(res => {
+    //               const profileData = {
+    //                 id: res.data.profile.userId,
+    //                 username: res.data.profile.userName,
+    //                 email: res.data.profile.email,
+    //                 name: res.data.profile.name,
+    //                 dob: res.data.profile.dob,
+    //                 phonenumber: res.data.profile.phoneNumber,
+    //               };
+    //               profileArray.push(profileData);
+    //               this.props.navigation.navigate('App');
+    //               console.log(JSON.stringify.message);
+    //             });
+    //           },
+    //           err => {
+    //             this.setState({
+    //               loading: false,
+    //             });
+    //             Alert.alert('Username or password is wrong');
+    //             console.log(err.message);
+    //           });
     //     }
-    // }
+    //     else {
+    //       Alert.alert('Enter Username & Password');
+    //     }
+    //   }
 
     doLogout() {
         AsyncStorage.removeItem('token')
@@ -159,22 +142,13 @@ class HomeScreen extends React.Component {
             dataSource: [],
         };
     }
-
-    doLogout() {
-        AsyncStorage.removeItem('token')
-            .then(
-                res => {
-                    this.props.navigation.navigate('Auth');
-                }
-            );
-    }
-    _renderItem = ({ item }) => {
+    renderItem = ({ item }) => {
         return (
             <View style={styles.item}>
-                <Text>{item.jobs.newJobs[0].id}</Text>
-                <Text>{item.jobs.newJobs[1].subscriber}</Text>
-                {/* <Image style={{ width: 50, height: 50 }} */}
-                {/* source={{ uri: item.jobs.newJobs.imageUrl }} /> */}
+                <Text>{item.status}</Text>
+                <Text>{item.jobs}</Text>
+                <Image style={styles.Image}
+                    source={{ uri: item.jobs.newJobs.imageUrl }} />
 
             </View>
         );
@@ -194,15 +168,17 @@ class HomeScreen extends React.Component {
                 },
                 body: dealerID,
             })
-            .then((response) => response.json())
-            .then((json) => {
-                console.log(json.message).
-                    this.setState({
-                        dataSource: json.jobs.newJobs,
-                    }).
+            .then(response => response.json())
+            .then((responseJson) => {
+                console.log(responseJson.message);
+                this.setState({
+                    dataSource: (responseJson.jobs.status),
+                }).
                     catch((error) => {
                         console.log(error.message);
                     });
+            }).catch(function (error) {
+                console.log(error);
             });
     }
     render() {
@@ -211,13 +187,8 @@ class HomeScreen extends React.Component {
             <View style={styles.container}>
                 <FlatList
                     data={this.state.dataSource}
-                    renderItem={this._renderItem}
+                    renderItem={this.renderItem}
                     keyExtractor={(item, index) => index}
-                />
-                <Button
-                    style={styles.logoutBtn}
-                    title="Logout"
-                    onPress={() => this.doLogout()}
                 />
             </View>
         );
@@ -234,6 +205,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    Image: {
+        width: 50,
+        height: 50,
     },
     logoutBtn: {
         width: '80%',
