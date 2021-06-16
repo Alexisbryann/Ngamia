@@ -12,6 +12,9 @@ import {
     StyleSheet,
     FlatList,
     Image,
+    ActivityIndicator,
+    List,
+    ListItem,
 
 } from 'react-native';
 import fetch from 'node-fetch';
@@ -63,60 +66,77 @@ class HomeScreen extends React.Component {
         super(props);
         this.state = {
             dataSource: [],
+            isLoading: true,
         };
     }
     renderItem = ({ item }) => {
         return (
             <View style={styles.item}>
-                <Text>{item.jobs.newJobs.id}</Text>
-                <Text>{item.jobs.newJobs.subscriber}</Text>
-                <Image style={styles.Image}
-                    source={{ uri: item.jobs.newJobs.imageUrl }} />
+                <Text>{item.jobs.new}</Text>
+                <Text>{item.jobs.accepted}</Text>
+                {/* <Image style={styles.Image}
+                    source={{ uri: item.jobs.newJobs.imageUrl }} /> */}
 
             </View>
         );
     }
 
     componentDidMount() {
+        this.getJobs();
+    }
+    getJobs() {
         const dealerID = AsyncStorage.getItem('dealerID');
         const token = AsyncStorage.getItem('token');
         const bearer = 'Bearer ' + token;
 
         fetch(jobsApi,
             {
-                method: 'post',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': bearer,
                 },
-                body: JSON.stringify(dealerID),
+                body: JSON.stringify({dealerID}),
             })
-            // .then(response => response.json())
-            .then((response) => {
-                this.setState({
-                    dataSource: (response.data.jobs.newJobs),
-                }).
-                    catch((error) => {
-                        console.log(error.message);
-                    });
-            }).catch(function (error) {
-                console.log(error.message);
-            });
+            .then(response => response.json()
+                .then(responseJson => {
+                    console.log(responseJson);
+                    this.setState({
+                        isLoading: false,
+                        dataSource: responseJson.jobs,
+                    }).
+                        catch((error) => {
+                            console.log(error.message);
+                        });
+                }).catch((error) => {
+                    console.log(error);
+                }),
+            );
     }
+
     render() {
 
-        return (
-            <View style={styles.container}>
-                <FlatList styles={styles.item}
-                    data={this.state.dataSource}
-                    renderItem={this.renderItem}
-                    keyExtr
-                    actor={(item, index) => item}
-                />
-                <Text style={styles.container}>We'll display Posted jobs here</Text>
 
-            </View>
-        );
+        const { isLoading, dataSource } = this.state;
+
+        if (isLoading) {
+            return (
+                <View style={styles.container}>
+                    <ActivityIndicator />
+                </View>
+            );
+        } else {
+            return (
+                <View style={styles.container}>
+                    <FlatList styles={styles.item}
+                        data={dataSource}
+                    renderItem={this.renderItem}
+                    keyExtractor={(item, index) => item}
+                    />
+                    <Text style={styles.container}>We'll display Posted jobs here</Text>
+                </View>
+            );
+        }
     }
 }
 
